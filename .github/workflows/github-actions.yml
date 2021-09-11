@@ -1,0 +1,36 @@
+name: Run Test Suite
+on: [push]
+jobs:
+  Test-Suite:
+    runs-on: ubuntu-latest
+    strategy:
+          matrix:
+            python-version: [ '3.6', '3.7', '3.8']
+            env:
+              - ANSIBLE_VERSION: 2.8
+              - ANSIBLE_VERSION: 2.9
+              - ANSIBLE_VERSION: 2.10
+              - ANSIBLE_VERSION: 4.0
+              - ANSIBLE_VERSION: 4.5
+    env: ${{ matrix.env }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install python dependencies
+        steps:
+          - run: pip install "ansible>=$ANSIBLE_VERSION.0,<$ANSIBLE_VERSION.99"
+          - run: pip install -r requirements-dev.txt
+          - run: pip install -e .
+      - name: Run Tests
+        steps:
+          - run: pylama
+          - run: ./run_tests.sh
+            working-directory: ./tests
+          - run: ./test_changelog.sh
+            working-directory: ./tests
+          - run: py.test
