@@ -19,18 +19,18 @@ DOCUMENTATION = """
 module: napalm_install_config_confirm
 author: "Richard Collins (@rbcollins123)"
 version_added: "4.5"
-short_description: "Installs the configuration taken from a file on a device supported 
-by NAPALM with a revert_in timer, then attemps to confirm the configuration session 
-within the target timer"
+short_description: "Installs the configuration taken from a file on a device supported
+ by NAPALM with a revert_in timer, then attemps to confirm the configuration session
+ within the target timer"
 description:
-    - "This library will take the configuration from a file and load it into a device 
-    running any OS supported by napalm. The old configuration will be replaced or 
-    merged with the new one.  The target device configuration session will be created 
-    with a commit confirmation timer to auto-revert the new configuration unless 
-    confirmed within the target # of seconds specififed in the revert_in argument.  
-    Ensure that the undelying napalm device driver you are using supports the 
-    commit-confirm feature per https://napalm.readthedocs.io/en/latest/support/index
-    .html
+    - "This library will take the configuration from a file and load it into a device
+     running any OS supported by napalm. The old configuration will be replaced or
+     merged with the new one.  The target device configuration session will be created
+     with a commit confirmation timer to auto-revert the new configuration unless
+     confirmed within the target # of seconds specififed in the revert_in argument.
+     Ensure that the undelying napalm device driver you are using supports the
+     commit-confirm feature per
+     https://napalm.readthedocs.io/en/latest/support/index.html
     "
 requirements:
     - napalm
