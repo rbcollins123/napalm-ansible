@@ -22,15 +22,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Install python dependencies
-        steps:
-          - run: pip install "ansible>=$ANSIBLE_VERSION.0,<$ANSIBLE_VERSION.99"
-          - run: pip install -r requirements-dev.txt
-          - run: pip install -e .
-      - name: Run Tests
-        steps:
-          - run: pylama
-          - run: ./run_tests.sh
-            working-directory: ./tests
-          - run: ./test_changelog.sh
-            working-directory: ./tests
-          - run: py.test
+        run: |
+          pip install "ansible>=$ANSIBLE_VERSION.0,<$ANSIBLE_VERSION.99"
+          pip install -r requirements-dev.txt
+          pip install -e .
+      - run: pylama
+      - run: ./run_tests.sh
+        working-directory: ./tests
+      - run: ./test_changelog.sh
+        working-directory: ./tests
+      - run: py.test
