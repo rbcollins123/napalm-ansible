@@ -103,33 +103,31 @@ options:
         default: True
         required: False
     archive_file:
-        description:
-            - File to store backup of running-configuration from device. Configuration will not be
-              retrieved if not set.
+        description: >
+            File to store backup of running-configuration from device.
+            Configuration will not be retrieved if not set.
         default: None
         required: False
     candidate_file:
-        description:
-            - Store a backup of candidate config from device prior to a commit.
+        description: Store a backup of candidate config from device prior to a commit.
         default: None
         required: False
     revert_in:
-        description:
-            - The number of seconds that the device configuration session should 
-            automatically roll back to the previous configuration if the session is not
-            confirmed.
+        description: >
+            The number of seconds that the device configuration session should
+             automatically roll back to the previous configuration if the session is not
+             confirmed.
         default: None
         required: True
     confirm_delay:
-        description:
-            - The number of seconds Ansible should wait before confirming the new 
-            configuration session on the target device.  This must be < revert_in for 
-            the session to actually be confirmed.  This can be used if you want to 
-            wait for network convergence or other propagations before cancelling the 
+        description: >
+            The number of seconds Ansible should wait before confirming the new
+            configuration session on the target device.  This must be < revert_in for
+            the session to actually be confirmed.  This can be used if you want to
+            wait for network convergence or other propagations before cancelling the
             auto-reversion provided by the configuration session.
         default: 0
         required: False
-        :
 """
 
 EXAMPLES = """
@@ -137,7 +135,7 @@ EXAMPLES = """
     src: '../compiled/{{ inventory_hostname }}/'
     dest: '../compiled/{{ inventory_hostname }}/running.conf'
 
-- name: Install Config with 120 second auto-rollback timer 
+- name: Install Config with 120 second auto-rollback timer
   napalm_install_config:
     hostname: '{{ inventory_hostname }}'
     username: '{{ user }}'
