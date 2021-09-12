@@ -20,4 +20,8 @@ ansible-playbook -i napalm_cli/hosts -l multiple_commands.ok napalm_cli/multiple
 ansible-playbook -i napalm_cli/hosts -l wrong_commands.err napalm_cli/wrong_args.yaml
 ansible-playbook -i napalm_cli/hosts -l multiple_commands.ok napalm_cli/check_mode.yaml -C
 
+ansible-playbook -i napalm_install_config_confirm/hosts -l "*.dry_run.*" napalm_install_config_confirm/config.yaml -C
+ansible-playbook -i napalm_install_config_confirm/hosts -l "*.commit.*" napalm_install_config_confirm/config.yaml
+ansible-playbook -i napalm_install_config_confirm/hosts -l "*.error*" napalm_install_config_confirm/config_error.yaml
+
 echo "All tests successful!"
