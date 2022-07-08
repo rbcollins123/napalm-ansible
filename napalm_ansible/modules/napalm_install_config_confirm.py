@@ -1,4 +1,5 @@
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
+
 import os.path
 import time
 
@@ -119,13 +120,14 @@ options:
              confirmed.
         default: None
         required: True
-    confirm_delay:
+    auto_confirm_time:
         description: >
             The number of seconds Ansible should wait before confirming the new
             configuration session on the target device.  This must be < revert_in for
             the session to actually be confirmed.  This can be used if you want to
             wait for network convergence or other propagations before cancelling the
-            auto-reversion provided by the configuration session.
+            auto-reversion provided by the configuration session. The default is to auto confirm
+            immediately.
         default: 0
         required: False
 """
@@ -146,7 +148,8 @@ EXAMPLES = """
     replace_config: '{{ replace_config }}'
     get_diffs: True
     diff_file: '../compiled/{{ inventory_hostname }}/diff'
-    revert_in: 120
+    revert_in: 300
+    auto_confirm_time: 15
 """
 
 RETURN = """
@@ -188,8 +191,7 @@ def main():
             provider=dict(type="dict", required=False),
             timeout=dict(type="int", required=False, default=60),
             optional_args=dict(required=False, type="dict", default=None),
-            config_file=dict(type="str", required=False),
-            config=dict(type="str", required=False),
+            config_file=dict(type="str", required=False), config=dict(type="str", required=False),
             dev_os=dict(type="str", required=False),
             commit_changes=dict(type="bool", required=True),
             replace_config=dict(type="bool", required=False, default=False),
@@ -198,10 +200,8 @@ def main():
             archive_file=dict(type="str", required=False, default=None),
             candidate_file=dict(type="str", required=False, default=None),
             revert_in=dict(type="int", required=True),
-            confirm_delay=dict(type="int", required=False, default=0)
-        ),
-        supports_check_mode=True,
-    )
+            auto_confirm_time=dict(type="int", required=False, default=0)
+        ), supports_check_mode=True, )
 
     if not napalm_found:
         module.fail_json(msg="the python module napalm is required")
@@ -217,7 +217,7 @@ def main():
                 return_values(provider["optional_args"].get(param))
             )
         if module.params.get("optional_args") and module.params["optional_args"].get(
-            param
+                param
         ):
             module.no_log_values.update(
                 return_values(module.params["optional_args"].get(param))
@@ -244,7 +244,7 @@ def main():
     archive_file = module.params["archive_file"]
     candidate_file = module.params["candidate_file"]
     revert_in = module.params["revert_in"]
-    confirm_delay = module.params["confirm_delay"]
+    auto_confirm_time = module.params["auto_confirm_time"]
     if config_file:
         config_file = os.path.expanduser(os.path.expandvars(config_file))
     if diff_file:
@@ -269,21 +269,10 @@ def main():
     except ModuleImportError as e:
         module.fail_json(msg="Failed to import napalm driver: " + str(e))
 
-    # Will not pass test until napalm MockDriver supports revised API
-    # try:
-    #     network_driver.confirm_commit()
-    # except NotImplementedError:
-    #     module.fail_json(msg="napalm driver for target dev_os does not support "
-    #                      "configuration session confirmation")
-
     try:
         device = network_driver(
-            hostname=hostname,
-            username=username,
-            password=password,
-            timeout=timeout,
-            optional_args=optional_args,
-        )
+            hostname=hostname, username=username, password=password, timeout=timeout,
+            optional_args=optional_args, )
         device.open()
     except Exception as e:
         module.fail_json(msg="cannot connect to device: " + str(e))
@@ -334,7 +323,7 @@ def main():
         else:
             if changed:
                 device.commit_config(revert_in=revert_in)
-                time.sleep(confirm_delay)
+                time.sleep(auto_confirm_time)
                 device.confirm_commit()
     except Exception as e:
         module.fail_json(msg="cannot install config: " + str(e))
