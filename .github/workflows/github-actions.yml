@@ -1,35 +1,45 @@
-name: Run Test Suite
-on: [push]
+name: Run Test Suite for PR
+on:
+    push:
+    pull_request:
+        branches:
+            - main
+            - master
+            - develop
 jobs:
   Test-Suite:
     runs-on: ubuntu-latest
     strategy:
           matrix:
-            #python-version: [ '3.6', '3.7', '3.8']
-            python-version: ['3.8']
+            python-version: [ '3.7', '3.8', '3.9', '3.10']
             env:
-              - ANSIBLE_VERSION: 2.8
-#              - ANSIBLE_VERSION: 2.9
-#              - ANSIBLE_VERSION: 2.10
-#              - ANSIBLE_VERSION: 4.0
-#              - ANSIBLE_VERSION: 4.5
+               - ANSIBLE_VERSION: "2.10"
+               - ANSIBLE_VERSION: "4.10"
     env: ${{ matrix.env }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Setup Python3
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+          cache: 'pip'
+          cache-dependency-path: "**/requirements*.txt"
       - name: Install python dependencies
         run: |
-          pip install "ansible>=$ANSIBLE_VERSION.0,<$ANSIBLE_VERSION.99"
-          pip install -r requirements-dev.txt
-          pip install -e .
-      - run: pylama
-      - run: ./run_tests.sh
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install six "ansible>=$ANSIBLE_VERSION.0,<$ANSIBLE_VERSION.99"
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -e .
+      - name: Check Code Style
+        run: pylama
+      - name: Run test playbooks
+        run: ./run_tests.sh
         working-directory: ./tests
-      - run: ./test_changelog.sh
+      - name: Run PyTest test suite
+        run: py.test
+      - name: Check for update to CHANGELOG.rst if targeting main branch
+        run: ./test_changelog.sh
         working-directory: ./tests
-      - run: py.test
+        if: github.ref_name == 'master' || github.ref_name == 'main'
