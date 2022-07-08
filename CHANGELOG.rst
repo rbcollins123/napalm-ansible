@@ -1,9 +1,10 @@
 develop
 =======
+    - add support for napalm commit_confirm feature
     - Provide diff in napalm_install_config in ``result.diff`` instead
       of ``result.msg``.
     - Drop support of Python 2.7
-    - Update tests to iuse Ansible 2.10.x.
+    - Update tests to use Ansible 2.10.x.
 
 1.1.0
 =====
