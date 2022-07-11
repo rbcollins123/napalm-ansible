@@ -138,7 +138,7 @@ EXAMPLES = """
     dest: '../compiled/{{ inventory_hostname }}/running.conf'
 
 - name: Install Config with 120 second auto-rollback timer
-  napalm_install_config:
+  napalm_install_config_confirm:
     hostname: '{{ inventory_hostname }}'
     username: '{{ user }}'
     dev_os: '{{ os }}'
@@ -149,7 +149,7 @@ EXAMPLES = """
     get_diffs: True
     diff_file: '../compiled/{{ inventory_hostname }}/diff'
     revert_in: 300
-    auto_confirm_time: 15
+    auto_confirm_time: 10
 """
 
 RETURN = """
